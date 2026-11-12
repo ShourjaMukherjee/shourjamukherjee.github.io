@@ -3,71 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A verifiable reward is a score that a program can compute. Why it works, and how it fails.">
-    <title>Rewards you can check · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>Rewards a program can check, and how they get gamed · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
     <article>
-        <h1>Rewards you can check</h1>
-        <p class="meta">November 13, 2026 · 3 min read</p>
-        <p class="lead">The agent learns what the reward pays for. Not what you meant.</p>
-        <p>So the reward must be correct. The safest reward is one that a program can check.</p>
-
-        <h2>Verifiable rewards</h2>
-        <p>A verifiable reward comes from a check with a clear yes or no. No opinion is involved.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Task</th><th>The check</th></tr>
-                <tr><td>Solve a math problem</td><td>Does the answer equal 51?</td></tr>
-                <tr><td>Write a function</td><td>Do the tests pass?</td></tr>
-                <tr><td>Solve a sudoku</td><td>Is each row, column, and box valid?</td></tr>
-                <tr><td>Output JSON</td><td>Does the output parse and match the schema?</td></tr>
-            </table>
-        </div>
-        <p>Training with rewards of this type has a name: RLVR, RL with verifiable rewards.</p>
-<pre><code>def reward(answer):
+        <h1>Rewards a program can check, and how they get gamed</h1>
+        <p>The most reliable rewards I know of are the ones a program can compute with a yes or a no: does the answer equal 51, do the tests pass, does the sudoku grid validate, does the output parse against the schema. Training on rewards like these is usually called RLVR (RL with verifiable rewards), and it is popular because the check is cheap, fast and gives the same answer every time.</p>
+        <pre><code>def reward(answer):
     return 1 if answer.strip() == "51" else 0</code></pre>
-        <p>The check is cheap, fast, and the same each time. You can run it a million times.</p>
+        <p>The catch is that a reward is a measurement of what you want, and a model under optimisation pressure will find any gap between the measurement and the goal. If you reward "the tests pass", at some point a model edits or deletes the tests. If you reward "these keywords appear in the summary", you get a list of keywords. OpenAI published a well-known example where an agent in a boat racing game was rewarded for hitting targets along the course and learned to circle a few of them indefinitely without ever finishing the race. None of this is the model misbehaving in any deep sense, since it is doing exactly what the reward pays for.</p>
 
-        <h2>When the reward is wrong</h2>
-        <p>A reward is a measurement of the goal. It is not the goal. An agent can find a way to get the measurement without the goal. This is <strong>reward hacking</strong>.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>You wanted</th><th>You rewarded</th><th>The agent did</th></tr>
-                <tr><td>A clean room</td><td>No dirt in view of the camera</td><td>Covered the camera</td></tr>
-                <tr><td>Correct code</td><td>Tests pass</td><td>Deleted the tests</td></tr>
-                <tr><td>A good summary</td><td>Key words are present</td><td>Wrote a list of key words</td></tr>
-                <tr><td>A fast lap</td><td>Points for checkpoints</td><td>Drove in a circle on one checkpoint</td></tr>
-            </table>
-        </div>
-        <p>The agent did not cheat. It did exactly what the reward paid for.</p>
+        <p>You also have to decide how often to pay. A sparse reward only pays at the end, which is hard to game and slow to learn from. A dense reward pays for intermediate steps, which speeds up learning and gives the model more things to exploit. I start sparse and only add intermediate rewards when the model clearly can't get off the ground.</p>
 
-        <h2>Sparse or dense</h2>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Type</th><th>When it pays</th><th>Good</th><th>Bad</th></tr>
-                <tr><td>Sparse</td><td>Only at the end</td><td>Hard to hack</td><td>Slow to learn from</td></tr>
-                <tr><td>Dense</td><td>At each small step</td><td>Fast to learn from</td><td>Easy to hack</td></tr>
-            </table>
-        </div>
-        <p>Each small reward is one more thing the agent can game. Start sparse. Add steps only when the agent cannot learn.</p>
-
-        <h2>Four habits</h2>
-        <ol>
-            <li><strong>Check the result, not the method.</strong> Reward the correct answer, not the steps that look correct.</li>
-            <li><strong>Keep the check out of reach.</strong> The agent must not be able to read or edit the tests.</li>
-            <li><strong>Try to break your own reward.</strong> Ask: what is the laziest way to get a 1?</li>
-            <li><strong>Read the high scores.</strong> A score that went up fast is the first place to look for a hack.</li>
-        </ol>
-
-        <p class="note">A reward is a measurement. Make it one that a program can check, and one that only the real goal can satisfy.</p>
-        <a class="next" href="blog.html">← All posts</a>
+        <p>A few habits help. Reward the final result and avoid rewarding steps that merely look right. Keep the checker somewhere the model can't read or modify. Before training, ask yourself what the laziest way to score a 1 would be. And when a score jumps suddenly, read those transcripts first, because that is where exploits tend to show up.</p>
     </article>
 
     <footer>&copy; 2026</footer>

@@ -3,44 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Two divisions in the GRPO formula bias what the model learns.">
-    <title>GRPO has two thumbs on the scale · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>Two divisions in GRPO that skew the update · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
     <article>
-        <h1>GRPO has two thumbs on the scale</h1>
-        <p class="meta">November 2026</p>
-        <p class="lead">GRPO divides by two things. Both divisions look harmless. Both are biases.</p>
+        <h1>Two divisions in GRPO that skew the update</h1>
+        <p>The GRPO update has two divisions in it that look like harmless normalisation. A 2025 paper argues that both of them bias what the model learns, and I found the argument convincing once I had worked through the numbers.</p>
 
-        <h2>Division 1: the group's spread</h2>
-        <p>GRPO scores each answer against the group: reward, minus the group mean, divided by the group standard deviation.</p>
-<pre><code>rewards [0,    1,    0,    0   ]  →  [-0.58, 1.73, -0.58, -0.58]
-rewards [0.50, 0.51, 0.50, 0.50]  →  [-0.58, 1.73, -0.58, -0.58]</code></pre>
-        <p>Same output. A clear win and a rounding error get the same push.</p>
-        <p>The paper states the effect at the question level: questions where the rewards barely differ, the too-easy and the too-hard, get <em>more</em> weight, not less.</p>
+        <p>The first is dividing by the group's standard deviation. For each question, GRPO samples a group of answers and scores each one as <code>(reward - mean) / std</code>.</p>
+        <pre><code>rewards [0,    1,    0,    0   ]  -&gt;  [-0.58, 1.73, -0.58, -0.58]
+rewards [0.50, 0.51, 0.50, 0.50]  -&gt;  [-0.58, 1.73, -0.58, -0.58]</code></pre>
+        <p>Those two groups produce identical numbers. In the first, one answer was clearly right and three were wrong. In the second the scores differ by 0.01, which could easily be grader noise. Dividing by the standard deviation stretches any spread, however small, to the same size. The way the paper puts it is that questions where the rewards barely vary, meaning the very easy and the very hard ones, end up with more weight in the update than they should have.</p>
 
-        <h2>Division 2: the answer's length</h2>
-        <p>GRPO also averages the loss over the tokens of each answer. So a long answer gets a smaller push per token.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Answer</th><th>Short</th><th>Long</th></tr>
-                <tr><td>Correct</td><td>Large reward</td><td>Small reward</td></tr>
-                <tr><td>Wrong</td><td>Large penalty</td><td>Small penalty</td></tr>
-            </table>
-        </div>
-        <p>Look at the bottom row. The cheapest way to be wrong is to be wrong at length. The paper links this to a known pattern: answers get longer during training, and wrong answers most of all.</p>
+        <p>The second is dividing each answer's loss by its length in tokens. A long answer has its push spread over more tokens, so each token moves less. For correct answers, that means short ones get reinforced harder than long ones. For wrong answers, it means long ones get penalised less than short ones, so if the model is going to be wrong, being wrong at length is the cheaper option. The paper connects this to something people had noticed in training runs, where responses keep getting longer and the incorrect ones grow the most.</p>
 
-        <h2>The fix</h2>
-        <p>Delete both divisions. That is the full change, and they call it Dr. GRPO. With it, a 7B model reached 43.3% on AIME 2024.</p>
-        <p>What is left is the plain policy gradient with the group mean as the baseline. The two extra terms were not in the theory to begin with.</p>
+        <p>Their fix, which they call Dr. GRPO, removes both divisions and keeps only "reward minus the group mean". They report a 7B model reaching 43.3% on AIME 2024 with that recipe.</p>
+
         <p class="paper">Paper: <a href="https://arxiv.org/abs/2503.20783" target="_blank" rel="noopener">Liu et al. Understanding R1-Zero-Like Training: A Critical Perspective (2025)</a></p>
-        <a class="next" href="blog.html">← All posts</a>
     </article>
 
     <footer>&copy; 2026</footer>

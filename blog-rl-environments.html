@@ -3,51 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="An RL environment is a small world with two functions: reset and step.">
-    <title>RL environments, from scratch · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>An RL environment is two functions · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
     <article>
-        <h1>RL environments, from scratch</h1>
-        <p class="meta">November 13, 2026 · 3 min read</p>
-        <p class="lead">An environment is the world that the agent practises in.</p>
-        <p>A pilot learns in a flight simulator. The simulator is the environment. A crash there costs nothing.</p>
-
-        <h2>Two functions</h2>
-        <p>An environment needs only two functions.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Function</th><th>What it does</th><th>What it returns</th></tr>
-                <tr><td><code>reset()</code></td><td>Starts a new try</td><td>The first state</td></tr>
-                <tr><td><code>step(action)</code></td><td>Applies one action</td><td>New state, reward, done</td></tr>
-            </table>
-        </div>
-        <p>One try, from <code>reset</code> to <code>done</code>, is an <strong>episode</strong>.</p>
-
-        <h2>The smallest environment</h2>
-        <p>A corridor has 5 cells. The agent starts in cell 0. The goal is cell 4.</p>
-        <figure>
-            <svg viewBox="0 0 640 96" role="img" aria-label="A corridor of five cells. The agent starts in cell 0. The goal is cell 4.">
-                <rect class="box on" x="70" y="20" width="100" height="50" rx="6"/>
-                <rect class="box" x="170" y="20" width="100" height="50" rx="6"/>
-                <rect class="box" x="270" y="20" width="100" height="50" rx="6"/>
-                <rect class="box" x="370" y="20" width="100" height="50" rx="6"/>
-                <rect class="box" x="470" y="20" width="100" height="50" rx="6"/>
-                <text x="520" y="50" text-anchor="middle">goal</text>
-                <text class="small" x="120" y="90" text-anchor="middle">0 (start)</text>
-                <text class="small" x="220" y="90" text-anchor="middle">1</text>
-                <text class="small" x="320" y="90" text-anchor="middle">2</text>
-                <text class="small" x="420" y="90" text-anchor="middle">3</text>
-                <text class="small" x="520" y="90" text-anchor="middle">4</text>
-            </svg>
-        </figure>
-<pre><code>class Corridor:
+        <h1>An RL environment is two functions</h1>
+        <p>"RL environment" sounds like a big simulator, but the interface is tiny. You need <code>reset()</code>, which starts a new attempt and returns the first state, and <code>step(action)</code>, which applies one action and returns the new state, a reward, and whether the attempt is over.</p>
+        <pre><code>class Corridor:
     def reset(self):
         self.pos = 0
         return self.pos
@@ -57,8 +22,8 @@
         done = self.pos == 4
         reward = 1 if done else 0
         return self.pos, reward, done</code></pre>
-        <p>That is a full environment. Now put an agent in it. This agent moves at random.</p>
-<pre><code>import random
+        <p>This is a corridor with five cells. You start in cell 0 and get a reward of 1 when you reach cell 4. Here is an agent that moves at random.</p>
+        <pre><code>import random
 
 env = Corridor()
 state = env.reset()
@@ -71,36 +36,11 @@ while not done:
     steps += 1
 
 print(steps)   # about 20 on average</code></pre>
-        <p>The shortest path is 4 steps. The random agent needs about 20. Learning closes that gap.</p>
+        <p>The shortest path is 4 steps and the random agent takes about 20 on average, and that gap is what a learning algorithm has to close.</p>
 
-        <h2>Four decisions</h2>
-        <p>To design an environment, you make four decisions.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Decision</th><th>Question</th><th>Corridor</th></tr>
-                <tr><td>State</td><td>What does the agent see?</td><td>The cell number</td></tr>
-                <tr><td>Actions</td><td>What can the agent do?</td><td>Left, right</td></tr>
-                <tr><td>Reward</td><td>What is good?</td><td>+1 at the goal</td></tr>
-                <tr><td>End</td><td>When does a try stop?</td><td>At the goal</td></tr>
-            </table>
-        </div>
-        <p>The reward is the hardest decision. The agent learns what the reward pays for, not what you meant.</p>
+        <p>Writing the two functions is the easy part. The design work is in four choices: what the agent gets to see (the state), what it is allowed to do (the actions), what counts as good (the reward), and when an attempt ends. The reward is the one I would spend the most time on, because the agent optimises exactly what you wrote down, including the parts you didn't think through.</p>
 
-        <h2>Environments for language models</h2>
-        <p>The same four decisions apply when the agent is a language model.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Part</th><th>Example: fix a bug</th></tr>
-                <tr><td>State</td><td>The task text and the files</td></tr>
-                <tr><td>Actions</td><td>Read a file, edit a file, run a command</td></tr>
-                <tr><td>Reward</td><td>1 if the tests pass, 0 if not</td></tr>
-                <tr><td>End</td><td>The model says "done", or a step limit</td></tr>
-            </table>
-        </div>
-        <p>A <strong>task</strong> is one start position in the environment. One environment can hold thousands of tasks.</p>
-
-        <p class="note">An environment is a state, a set of actions, a reward, and an end. Two functions hold all four.</p>
-        <a class="next" href="blog-policy-gradients.html">Next: Policy gradients, from scratch →</a>
+        <p>The same shape carries over to language models. For a "fix this bug" environment, the state is the task description plus the repo, the actions are things like reading a file, editing a file or running a command, the reward is 1 if the test suite passes, and the episode ends when the model says it is done or runs out of steps. A task is one starting point in that environment, and a single environment can hold thousands of them.</p>
     </article>
 
     <footer>&copy; 2026</footer>

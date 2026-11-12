@@ -3,70 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Short notes on reinforcement learning and evals.">
-    <title>Blog · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>Writing · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
-    <header>
-        <h1>Blog</h1>
-    </header>
-
-    <h2>Notes on papers</h2>
-    <ul class="post-list">
-        <li><a href="blog-rl-razor.html">
-            <div class="row"><span class="t">Why RL forgets less</span><span class="d">RL</span></div>
-            <p>RL fine-tuning keeps old skills. The reason is distance, not RL.</p>
-        </a></li>
-        <li><a href="blog-grpo-bias.html">
-            <div class="row"><span class="t">GRPO has two thumbs on the scale</span><span class="d">RL</span></div>
-            <p>Two divisions in the formula. Both are biases.</p>
-        </a></li>
-        <li><a href="blog-softmax-slow.html">
-            <div class="row"><span class="t">Policy gradients are slowest when most wrong</span><span class="d">RL</span></div>
-            <p>A confident wrong policy rarely tries the right action.</p>
-        </a></li>
-        <li><a href="blog-eval-clusters.html">
-            <div class="row"><span class="t">Your eval has fewer questions than you think</span><span class="d">Evals</span></div>
-            <p>Questions that share a passage are one coin flip, counted many times.</p>
-        </a></li>
-    </ul>
-
-    <h2>Basics</h2>
-    <ul class="post-list">
-        <li><a href="blog-rl.html">
-            <div class="row"><span class="t">Reinforcement learning, from scratch</span><span class="d">1</span></div>
-            <p>Try, get a score, adjust.</p>
-        </a></li>
-        <li><a href="blog-rl-environments.html">
-            <div class="row"><span class="t">RL environments, from scratch</span><span class="d">2</span></div>
-            <p>A small world with two functions: reset and step.</p>
-        </a></li>
-        <li><a href="blog-policy-gradients.html">
-            <div class="row"><span class="t">Policy gradients, from scratch</span><span class="d">3</span></div>
-            <p>If an action got a reward, make that action more likely.</p>
-        </a></li>
-        <li><a href="blog-grpo.html">
-            <div class="row"><span class="t">GRPO, from scratch</span><span class="d">4</span></div>
-            <p>Grade each answer against the other answers to the same question.</p>
-        </a></li>
-        <li><a href="blog-verifiable-rewards.html">
-            <div class="row"><span class="t">Rewards you can check</span><span class="d">5</span></div>
-            <p>The agent learns what the reward pays for. Not what you meant.</p>
-        </a></li>
-        <li><a href="blog-evals.html">
-            <div class="row"><span class="t">Evals, from scratch</span><span class="d">6</span></div>
-            <p>An eval is an exam for a model.</p>
-        </a></li>
-        <li><a href="blog-post-1.html">
-            <div class="row"><span class="t">Understanding Transformers</span><span class="d">2024</span></div>
-            <p>How Transformers changed NLP.</p>
-        </a></li>
+    <h1>Writing</h1>
+    <ul class="posts">
+            <li><a href="blog-mongo-postgres.html">Notes on a zero-downtime Mongo to Postgres migration</a></li>
+            <li><a href="blog-rl-razor.html">Why RL fine-tuning forgets less than SFT</a></li>
+            <li><a href="blog-grpo-bias.html">Two divisions in GRPO that skew the update</a></li>
+            <li><a href="blog-softmax-slow.html">A confidently wrong policy barely learns</a></li>
+            <li><a href="blog-eval-clusters.html">Eval questions that share a passage don't count separately</a></li>
+            <li><a href="blog-grpo.html">What a GRPO step actually computes</a></li>
+            <li><a href="blog-policy-gradients.html">Policy gradients with two buttons</a></li>
+            <li><a href="blog-rl-environments.html">An RL environment is two functions</a></li>
+            <li><a href="blog-rl.html">The RL loop in 15 lines of Python</a></li>
+            <li><a href="blog-verifiable-rewards.html">Rewards a program can check, and how they get gamed</a></li>
+            <li><a href="blog-evals.html">What goes into a basic eval</a></li>
     </ul>
 
     <footer>&copy; 2026</footer>

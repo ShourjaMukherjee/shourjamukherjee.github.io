@@ -4,7 +4,6 @@
     --muted: #77756e;
     --line: #e6e3db;
     --accent: #b4532a;
-    --card: #ffffff;
     --code-bg: #f2f0ea;
     --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Charter, Georgia, serif;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -16,7 +15,6 @@
         --muted: #96938b;
         --line: #2b2a27;
         --accent: #e59a6f;
-        --card: #1c1c1a;
         --code-bg: #20201e;
     }
 }
@@ -27,8 +25,8 @@ body {
     font-size: 17px;
     line-height: 1.7;
     margin: 0 auto;
-    padding: 28px 22px 72px;
-    max-width: 680px;
+    padding: 56px 22px 72px;
+    max-width: 660px;
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
@@ -36,94 +34,48 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 64px;
-    font-size: 0.92rem;
-}
+nav { margin: -20px 0 48px; font-size: 0.9rem; }
 nav a { color: var(--muted); }
 nav a:hover { color: var(--text); text-decoration: none; }
-nav .right { margin-left: auto; }
 
 h1 {
     font-family: var(--serif);
     font-weight: 600;
-    font-size: 2.5rem;
-    line-height: 1.15;
+    font-size: 2.2rem;
+    line-height: 1.2;
     letter-spacing: -0.01em;
-    margin: 0 0 12px;
+    margin: 0 0 20px;
 }
 h2 {
-    font-size: 0.74rem;
+    font-family: var(--serif);
+    font-size: 1.35rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 56px 0 18px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--line);
+    margin: 48px 0 12px;
 }
-h3 { font-size: 1rem; font-weight: 600; margin: 0; }
-.meta { color: var(--muted); font-size: 0.9rem; margin: 0 0 6px; }
-.lead { font-family: var(--serif); font-size: 1.3rem; line-height: 1.5; margin: 22px 0 0; }
-.links { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.95rem; }
+h3 { font-size: 1rem; font-weight: 600; margin: 28px 0 6px; }
+p { margin: 0 0 16px; }
 
-ul { padding-left: 18px; margin: 8px 0 0; }
-li { margin-bottom: 6px; }
-li::marker { color: var(--muted); }
+/* Home */
+.home p { max-width: 36em; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 0.95rem; }
+.posts { list-style: none; padding: 0; margin: 0; }
+.posts li { margin: 0 0 9px; }
 
-/* Home page entries */
-.entry { margin-bottom: 30px; }
+.entry { margin-bottom: 26px; }
+.entry h3 { margin: 0; }
 .entry-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 16px; }
 .entry-head span { color: var(--muted); font-size: 0.88rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .entry .org { color: var(--muted); font-size: 0.93rem; margin: 0; }
-.entry ul { font-size: 0.96rem; }
-.tags { color: var(--text); font-size: 0.96rem; margin: 0 0 8px; }
+.entry ul { font-size: 0.95rem; padding-left: 18px; margin: 8px 0 0; }
+.entry li { margin-bottom: 5px; }
+li::marker { color: var(--muted); }
+.tags { font-size: 0.95rem; margin: 0 0 8px; }
 .tags b { font-weight: 600; margin-right: 6px; }
 
-/* Blog list */
-.post-list { list-style: none; padding: 0; margin: 0; }
-.post-list li { margin: 0; border-bottom: 1px solid var(--line); }
-.post-list a { display: block; padding: 18px 0; color: var(--text); }
-.post-list a:hover { text-decoration: none; }
-.post-list a:hover .t { color: var(--accent); }
-.post-list .row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
-.post-list .t { font-family: var(--serif); font-size: 1.22rem; font-weight: 600; line-height: 1.3; }
-.post-list .d { color: var(--muted); font-size: 0.85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.post-list p { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
-
-/* Blog posts */
-article h1 { font-size: 2.2rem; }
-article h2 {
-    font-family: var(--serif);
-    font-size: 1.4rem;
-    font-weight: 600;
-    letter-spacing: 0;
-    text-transform: none;
-    color: var(--text);
-    border: 0;
-    padding: 0;
-    margin: 44px 0 10px;
-}
-article p { margin: 0 0 16px; }
+/* Posts */
 article ul, article ol { margin: 0 0 16px; padding-left: 22px; }
-article .lead { margin: 26px 0 18px; }
-.note {
-    border-left: 2px solid var(--accent);
-    padding: 4px 0 4px 18px;
-    margin: 36px 0 0;
-    font-family: var(--serif);
-    font-size: 1.12rem;
-}
-.next {
-    display: block;
-    margin-top: 44px;
-    padding-top: 18px;
-    border-top: 1px solid var(--line);
-    font-size: 0.95rem;
-}
+article li { margin-bottom: 6px; }
+.paper { margin-top: 36px; color: var(--muted); font-size: 0.9rem; }
 code, pre {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.86em;
@@ -136,26 +88,18 @@ pre code { padding: 0; background: none; font-size: 1em; }
 .table-wrap { overflow-x: auto; margin: 0 0 20px; }
 table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
 th, td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { color: var(--muted); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
+th { color: var(--muted); font-weight: 600; }
 figure { margin: 8px 0 24px; }
 figure svg { width: 100%; height: auto; display: block; }
-svg .box { fill: var(--card); stroke: var(--muted); stroke-width: 1.2; }
-svg .on { fill: var(--accent); stroke: var(--accent); }
-svg .arrow { stroke: var(--accent); stroke-width: 1.6; fill: none; }
-svg .head { fill: var(--accent); }
+figcaption { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 8px; }
+svg .axis { stroke: var(--muted); stroke-width: 1.2; fill: none; }
+svg .line { stroke: var(--accent); stroke-width: 1.8; fill: none; }
+svg .line.dim { stroke: var(--muted); stroke-dasharray: 6 5; }
 svg text { fill: var(--text); font-family: var(--sans); font-size: 15px; }
 svg text.small { fill: var(--muted); font-size: 13px; }
 footer { margin-top: 72px; color: var(--muted); font-size: 0.85rem; }
 
 @media (max-width: 520px) {
-    body { font-size: 16px; }
-    h1 { font-size: 2rem; }
-    article h1 { font-size: 1.8rem; }
-    nav { margin-bottom: 44px; }
+    body { font-size: 16px; padding-top: 36px; }
+    h1 { font-size: 1.8rem; }
 }
-
-/* Paper notes */
-.paper { margin-top: 40px; color: var(--muted); font-size: 0.9rem; }
-figcaption { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 8px; }
-svg .axis { stroke: var(--muted); stroke-width: 1.2; fill: none; }
-svg .arrow.dim { stroke: var(--muted); stroke-dasharray: 6 5; }

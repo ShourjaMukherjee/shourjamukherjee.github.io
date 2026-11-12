@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes on a zero-downtime Mongo to Postgres migration · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
+</head>
+<body>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
+
+    <article>
+        <h1>Notes on a zero-downtime Mongo to Postgres migration</h1>
+        <p>We ran on MongoDB for a long time and then moved a live system to Postgres without a maintenance window. These are the notes I would have wanted before starting.</p>
+
+        <h2>Why we moved</h2>
+        <p>Schemaless felt great early on, because you add a field, ship it and move on. A couple of years in, one collection had quietly turned into about six different document shapes depending on which version of the code had written the document, and every reader had to cope with all of them. Nested arrays were the other recurring pain, since updating one element inside an array inside a document atomically is fiddly and we had a lot of those. And once the data had become relational enough, we were writing <code>$lookup</code> pipelines that were hard to read and slow to run. By then we were using a document store as a relational database with worse joins.</p>
+
+        <h2>Finding out what was actually in there</h2>
+        <p>Before creating a single table I had to find out what prod really contained, because the application code only tells you what the latest writer does. A script that walks a collection and counts the types seen for each field gets you most of the way.</p>
+        <pre><code>from collections import Counter, defaultdict
+
+seen = defaultdict(Counter)
+for doc in db.orders.find():
+    for key, value in doc.items():
+        seen[key][type(value).__name__] += 1
+
+for key, types in seen.items():
+    print(key, dict(types))
+# quantity {'int': ..., 'str': ..., 'NoneType': ...}</code></pre>
+        <p>That turns up fields that are null in some slice of documents, fields that are a string in old documents and an int in new ones, and fields nobody remembers adding. Then you go through them one at a time. Anything we filtered, joined or needed a constraint on became a real column with a type, and a foreign key where it made sense. Anything free-form or rarely read went into a <code>JSONB</code> column. Having that escape hatch meant we didn't have to design the perfect schema on day one, and promoting a JSONB field to a column later is an easy change.</p>
+
+        <h2>The rollout</h2>
+        <p>There were four phases, and we could stop or roll back at any of them.</p>
+
+        <h3>1. Dual-write</h3>
+        <p>Every write goes to Mongo first, exactly as before, and then the same change gets transformed and written to Postgres. Mongo is still the source of truth at this point, so a Postgres failure must never fail the request.</p>
+        <pre><code>def save_order(order):
+    mongo.orders.replace_one({"_id": order["_id"]}, order, upsert=True)
+    try:
+        pg.upsert_order(to_row(order))
+    except Exception:
+        log.exception("pg shadow write failed", extra={"id": str(order["_id"])})
+        metrics.incr("pg_shadow_write_failed")</code></pre>
+        <p>The counter is as important as the try/except. A swallowed error that nobody is counting is how you end up with a shadow table that is silently missing rows.</p>
+
+        <h3>2. Backfill</h3>
+        <p>Dual-writing only covers documents that change after you switch it on, so a background worker sweeps the historical documents across in batches. The thing to get right is that the backfill must not overwrite a newer row that the live path has already written, so the insert does nothing on conflict.</p>
+        <pre><code>INSERT INTO orders (id, customer_id, status, total, extra, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT (id) DO NOTHING;</code></pre>
+        <p>If you want the backfill to also repair stale rows, use <code>DO UPDATE ... WHERE orders.updated_at &lt; EXCLUDED.updated_at</code> so the newest write wins whichever path it came from. Either way the job is idempotent, which means you can kill it and rerun it as often as you need to, and you will need to.</p>
+
+        <h3>3. Shadow reads</h3>
+        <p>With both stores populated, the read path kept serving from Mongo, and in the background it fetched the same record from Postgres and diffed the two.</p>
+        <pre><code>def get_order(order_id):
+    doc = mongo.orders.find_one({"_id": order_id})
+    if flags.shadow_read:
+        background(compare, order_id, doc)
+    return doc
+
+def compare(order_id, doc):
+    row = pg.get_order(str(order_id))
+    if normalize(doc) != normalize(row):
+        log.warning("parity mismatch", extra={"id": str(order_id)})
+        metrics.incr("parity_mismatch")</code></pre>
+        <p>This is the phase that finds things. The mismatches were mostly about representation and very rarely about missing data. Mongo dates are UTC milliseconds while a Postgres <code>timestamptz</code> has microseconds and comes back with whatever offset the driver gives you. Some floats should have been <code>numeric</code> all along. A field that is absent in a Mongo document shows up as <code>NULL</code> in a row, and a naive diff calls that a mismatch. <code>ObjectId</code>s have to become strings or UUIDs on the other side. We fixed these one class at a time until the mismatch counter stayed at zero for long enough that we trusted it.</p>
+
+        <h3>4. Cutover</h3>
+        <p>The switch itself was a config flag. Reads moved to Postgres first. Once that had been boring for a while, we swapped the write order so that Postgres became the primary and Mongo became the shadow, which left us a warm fallback. After a stretch with no reason to go back, we deleted the Mongo client code and the dual-write wrapper.</p>
+
+        <h2>If I did it again</h2>
+        <p>I would build the diff tooling first. Most of the effort went into the audit and the parity phase and very little into the cutover, and the diff is the thing that tells you when each step is safe to take.</p>
+    </article>
+
+    <footer>&copy; 2026</footer>
+</body>
+</html>

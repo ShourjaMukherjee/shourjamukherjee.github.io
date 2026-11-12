@@ -3,74 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="RL fine-tuning keeps old skills better than SFT. The reason is distance, not RL.">
-    <title>Why RL forgets less · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>Why RL fine-tuning forgets less than SFT · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
     <article>
-        <h1>Why RL forgets less</h1>
-        <p class="meta">November 2026</p>
-        <p class="lead">Teach a model a new task with RL and it keeps its old skills. Teach it the same task with SFT and it loses them.</p>
+        <h1>Why RL fine-tuning forgets less than SFT</h1>
+        <p>If you fine-tune a model on a new task with RL, it mostly keeps its scores on unrelated benchmarks. If you fine-tune it to the same accuracy with supervised fine-tuning, those scores drop. I had seen the plot from the RL's Razor paper a few times without understanding how they got from the plot to an explanation, so I went through it properly.</p>
 
         <figure>
             <svg viewBox="0 0 640 250" role="img" aria-label="Sketch: as new task accuracy rises, the RL line stays flat and the SFT line falls.">
                 <path class="axis" d="M70 20 V205 H610"/>
-                <path class="arrow" d="M70 45 C 300 45, 480 48, 590 62"/>
-                <path class="arrow dim" d="M70 45 C 300 52, 500 90, 590 195"/>
+                <path class="line" d="M70 45 C 300 45, 480 48, 590 62"/>
+                <path class="line dim" d="M70 45 C 300 52, 500 90, 590 195"/>
                 <text x="596" y="58">RL</text>
                 <text x="596" y="200">SFT</text>
                 <text class="small" x="340" y="238" text-anchor="middle">new task accuracy →</text>
                 <text class="small" x="26" y="118" text-anchor="middle" transform="rotate(-90 26 118)">old tasks →</text>
             </svg>
-            <figcaption>My sketch of Figure 2. Each real point is one fine-tuned model.</figcaption>
+            <figcaption>My sketch of their Figure 2. In the real plot each point is one fine-tuned model.</figcaption>
         </figure>
 
-        <p>That is the graph. I never got how they showed <em>why</em>. It is four steps.</p>
+        <p>They start by looking for a single number that predicts how much a model forgets. To do that cheaply they use a toy task where an MNIST classifier has to say whether a digit is even or odd, and any even label counts as correct for an even digit, so there are many valid ways to be right. They fine-tune a lot of models with both methods and compare forgetting against candidates like how much the weights changed, how much the activations changed, and how far the model's outputs on the new task moved from the base model's outputs (measured with KL divergence). Output shift wins clearly. RL runs and SFT runs land on the same curve with an R² of 0.96 on the toy task and 0.71 in their LLM experiments, while the weight-change measures score between 0.34 and 0.58.</p>
 
-        <h2>1. Find what predicts forgetting</h2>
-        <p>They built a toy task: say if an MNIST digit is even or odd. For an even image, any even label counts. So there are many correct ways to answer.</p>
-        <p>Then they fine-tuned many models, with RL and with SFT, and plotted forgetting against one number: how far the model's outputs moved from the base model, <em>on the new task</em>, in KL divergence.</p>
-        <p>RL points and SFT points fell on one curve. R² = 0.96 on the toy task, 0.71 on real LLMs. Weight change, the usual suspect, got 0.34 to 0.58.</p>
+        <p>Then they check that the output shift is the real cause and that RL itself is incidental. In the toy task you can work out which labels keep the model as close as possible to its starting outputs while still being fully correct. SFT trained on those labels forgets even less than RL does.</p>
 
-        <h2>2. Break the tie with a trick</h2>
-        <p>If distance is the cause, SFT with the right labels must also forget less. In the toy task you can compute the labels that stay closest to the base model. They trained SFT on those.</p>
-        <p>It forgot <em>less than RL</em>. So RL has no magic. It only moves less.</p>
+        <p>That leaves the question of why RL shifts the outputs less. RL differs from SFT in two ways: it trains on the model's own samples, and it sees wrong answers and pushes away from them. They run all four combinations. The two methods that train on the model's own samples (GRPO, and a variant that only keeps the correct samples) both hold on to old skills. The two that train on outside data (plain SFT, and SimPO, which adds negative examples) both forget. So the part that matters is training on your own samples.</p>
 
-        <h2>3. Ask why RL moves less</h2>
-        <p>RL differs from SFT in two ways: it learns from its own samples, and it sees wrong answers. Which one matters? They tested all four mixes.</p>
+        <p>The theory section is easier to follow with numbers. Ask the base model "2 + 2?" and suppose it says "4" half the time, "four" 30% of the time and "5" 20% of the time.</p>
+
         <div class="table-wrap">
-            <table>
-                <tr><th></th><th>Correct only</th><th>Correct + wrong</th></tr>
-                <tr><td>Own samples</td><td>1-0 REINFORCE: keeps old skills</td><td>GRPO: keeps old skills</td></tr>
-                <tr><td>Outside data</td><td>SFT: forgets</td><td>SimPO: forgets</td></tr>
-            </table>
+        <table>
+            <tr><th></th><th>"4"</th><th>"four"</th><th>"5"</th><th>KL from base</th></tr>
+            <tr><td>Base model</td><td>50%</td><td>30%</td><td>20%</td><td>0</td></tr>
+            <tr><td>RL, keeping its own correct samples</td><td>62.5%</td><td>37.5%</td><td>0%</td><td>0.22</td></tr>
+            <tr><td>SFT on labels that all say "four"</td><td>0%</td><td>100%</td><td>0%</td><td>1.20</td></tr>
+        </table>
         </div>
-        <p>The row decides, not the column. It is the model's own samples.</p>
 
-        <h2>4. The proof, in one example</h2>
-        <p>Ask the base model "2 + 2?".</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th></th><th>"4"</th><th>"four"</th><th>"5"</th><th>KL from base</th></tr>
-                <tr><td>Base model</td><td>50%</td><td>30%</td><td>20%</td><td>0</td></tr>
-                <tr><td>RL: keep own correct samples</td><td>62.5%</td><td>37.5%</td><td>0%</td><td>0.22</td></tr>
-                <tr><td>SFT: labels all say "four"</td><td>0%</td><td>100%</td><td>0%</td><td>1.20</td></tr>
-            </table>
-        </div>
-        <p>RL deletes the wrong answer and keeps the 5:3 ratio the model already had. Their Lemma 5.1 says this is the closest fully correct distribution to the base. No other one is nearer.</p>
-        <p>SFT copies whatever the labels say. The labels do not know what the model liked before.</p>
-        <p>Theorem 5.2 repeats that step until convergence: with a 0/1 reward, policy gradient ends at the correct policy closest to where it started.</p>
+        <p>RL removes the wrong answer and leaves the 5:3 preference the model already had untouched. The SFT dataset knows nothing about that preference, so it drags the model all the way to "four", which is a much bigger move for the same accuracy. The paper proves that the "keep your own correct samples" distribution is the closest fully correct one to where you started, and that policy gradient with a 0/1 reward converges to it.</p>
 
-        <h2>The catch</h2>
-        <p>The theorem needs a simple setting: binary reward, a convex family of policies. And nobody knows yet why moving far on the <em>new</em> task damages the <em>old</em> ones. The law is measured, not explained.</p>
+        <p>Two caveats from the authors. The proof is for a simplified setting, and they don't yet have an explanation for why a large shift on the new task hurts unrelated old tasks, so for now it is a measured relationship.</p>
+
         <p class="paper">Paper: <a href="https://arxiv.org/abs/2509.04259" target="_blank" rel="noopener">Shenfeld, Pari, Agrawal. RL's Razor: Why Online Reinforcement Learning Forgets Less (2025)</a></p>
-        <a class="next" href="blog.html">← All posts</a>
     </article>
 
     <footer>&copy; 2026</footer>

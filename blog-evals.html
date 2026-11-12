@@ -3,89 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="An eval is an exam for a model. A short explanation from scratch.">
-    <title>Evals, from scratch · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>What goes into a basic eval · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
     <article>
-        <h1>Evals, from scratch</h1>
-        <p class="meta">November 13, 2026 · 3 min read</p>
+        <h1>What goes into a basic eval</h1>
+        <p>An eval is an exam for a model, and it has three pieces: a dataset of questions with known answers, the model you are testing, and a grader that decides whether each answer is right. If you ask a model for five capital cities and it gets four right and says Sydney for Australia, the score is 80%, and that is already a complete eval.</p>
 
-        <p class="lead">An eval is an exam for a model.</p>
-        <p>You ask questions. The model answers. You grade the answers. The grade tells you how good the model is.</p>
+        <p>Most of the decisions are in the grader. Exact match works when there is one right answer, although it will mark "Paris, France" wrong against "Paris" unless you normalise first. A code check, like running the tests or validating the JSON, is great when the output is structured. Humans can grade open-ended answers and are slow and expensive. Using another model as a judge scales well, and the judge makes its own mistakes, so you need to spot-check it. I use the simplest grader that works for the task.</p>
 
-        <h2>The three parts</h2>
-        <figure>
-            <svg viewBox="0 0 640 110" role="img" aria-label="Dataset goes to the model, the model output goes to the grader, the grader gives a score">
-                <rect class="box" x="10" y="30" width="120" height="50" rx="6"/>
-                <text x="70" y="60" text-anchor="middle">Dataset</text>
-                <rect class="box" x="180" y="30" width="120" height="50" rx="6"/>
-                <text x="240" y="60" text-anchor="middle">Model</text>
-                <rect class="box" x="350" y="30" width="120" height="50" rx="6"/>
-                <text x="410" y="60" text-anchor="middle">Grader</text>
-                <rect class="box" x="520" y="30" width="110" height="50" rx="6"/>
-                <text x="575" y="60" text-anchor="middle">Score</text>
-                <path class="arrow" d="M130 55 H172"/><path class="head" d="M180 55 l-9 -5 v10 z"/>
-                <path class="arrow" d="M300 55 H342"/><path class="head" d="M350 55 l-9 -5 v10 z"/>
-                <path class="arrow" d="M470 55 H512"/><path class="head" d="M520 55 l-9 -5 v10 z"/>
-                <text class="small" x="155" y="22" text-anchor="middle">questions</text>
-                <text class="small" x="325" y="22" text-anchor="middle">answers</text>
-                <text class="small" x="495" y="22" text-anchor="middle">grades</text>
-            </svg>
-        </figure>
-        <ul>
-            <li><strong>Dataset.</strong> The questions, each with a correct answer.</li>
-            <li><strong>Model.</strong> The thing you test.</li>
-            <li><strong>Grader.</strong> The rule that says if an answer is right.</li>
-        </ul>
+        <p>There are a few rules I try to hold to. Keep eval questions out of the training data, since a model that has seen the exam tells you nothing. Keep the question set fixed, otherwise two scores aren't comparable. Read the wrong answers as well as the number. Break the score down by category, because 80% overall can hide 99% on easy questions and 20% on hard ones. And record which model, dataset and grader versions produced a number, so that someone else can reproduce it.</p>
 
-        <h2>A small example</h2>
-        <p>The task: name the capital of a country.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Question</th><th>Correct</th><th>Model said</th><th>Grade</th></tr>
-                <tr><td>France</td><td>Paris</td><td>Paris</td><td>1</td></tr>
-                <tr><td>Japan</td><td>Tokyo</td><td>Tokyo</td><td>1</td></tr>
-                <tr><td>Australia</td><td>Canberra</td><td>Sydney</td><td>0</td></tr>
-                <tr><td>Kenya</td><td>Nairobi</td><td>Nairobi</td><td>1</td></tr>
-                <tr><td>Canada</td><td>Ottawa</td><td>Ottawa</td><td>1</td></tr>
-            </table>
-        </div>
-        <p>Score: 4 of 5, or 80%. That is a full eval.</p>
-
-        <h2>Four types of grader</h2>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Grader</th><th>Good for</th><th>Weak point</th></tr>
-                <tr><td>Exact match</td><td>One correct answer</td><td>Fails on "paris" vs "Paris, France"</td></tr>
-                <tr><td>Code check</td><td>Math, code, structured output</td><td>You must write the check</td></tr>
-                <tr><td>Human</td><td>Open answers, such as essays</td><td>Slow and costly</td></tr>
-                <tr><td>Model as judge</td><td>Open answers, at scale</td><td>The judge also makes errors</td></tr>
-            </table>
-        </div>
-        <p>Use the simplest grader that works.</p>
-
-        <h2>Five rules</h2>
-        <ol>
-            <li><strong>Do not train on the exam.</strong> A student who saw the paper before the exam gets 100%. That score means nothing.</li>
-            <li><strong>Keep the exam fixed.</strong> If the questions change, you cannot compare two scores.</li>
-            <li><strong>Look at the errors.</strong> Read the wrong answers. The number does not tell you why.</li>
-            <li><strong>Split the score.</strong> 80% overall can be 99% on easy questions and 20% on hard questions.</li>
-            <li><strong>Write down what you ran.</strong> Model version, dataset version, grader version. Without these, nobody can repeat the result.</li>
-        </ol>
-
-        <h2>Small exams are noisy</h2>
-        <p>Flip a fair coin 10 times. You can get 7 heads. The coin is still fair.</p>
-        <p>Evals have the same problem. With 100 questions, a score of 80% has an error of about ±8 points. So 80% and 83% are possibly the same model quality.</p>
-        <p>More questions give a smaller error. With 1,000 questions, the error is about ±2.5 points.</p>
-
-        <p class="note">Fixed questions, a clear grader, and a record of what you ran. Everything else is detail.</p>
+        <p>The other thing worth knowing is how noisy small evals are. On 100 questions, a score of 80% has a 95% interval of roughly ±8 points, so 80 and 83 could easily be the same model. On 1,000 questions it is about ±2.5. It gets worse when questions share a passage, which I wrote about in <a href="blog-eval-clusters.html">this note</a>.</p>
     </article>
 
     <footer>&copy; 2026</footer>

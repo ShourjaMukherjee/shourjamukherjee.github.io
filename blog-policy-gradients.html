@@ -3,81 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Make good actions more likely. The policy gradient idea in one small example.">
-    <title>Policy gradients, from scratch · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>Policy gradients with two buttons · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
     <article>
-        <h1>Policy gradients, from scratch</h1>
-        <p class="meta">November 13, 2026 · 3 min read</p>
-        <p class="lead">If an action got a reward, make that action more likely.</p>
-        <p>That sentence is the full method. The rest is arithmetic.</p>
+        <h1>Policy gradients with two buttons</h1>
+        <p>This uses the same slot machine as <a href="blog-rl.html">the RL loop post</a>, where button A pays out 30% of the time and button B pays 70%. In that post the agent kept an average payout for each button. A policy gradient method skips the averages and stores the thing you actually care about, which is how likely the agent is to press each button.</p>
 
-        <h2>A policy is a set of probabilities</h2>
-        <p>In the <a href="blog-rl.html">first post</a>, the agent kept an average reward for each button. Here the agent keeps something more direct: the probability of each action.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th></th><th>Button A</th><th>Button B</th></tr>
-                <tr><td>At the start</td><td>50%</td><td>50%</td></tr>
-                <tr><td>After learning</td><td>1%</td><td>99%</td></tr>
-            </table>
-        </div>
-        <p>To act, the agent samples from these probabilities. No explore rule is necessary. The sampling does the exploring.</p>
-
-        <h2>The update</h2>
-        <ol>
-            <li>Sample an action.</li>
-            <li>Get the reward.</li>
-            <li>If the reward is high, raise the probability of that action. The other actions go down.</li>
-        </ol>
-        <p>The size of the change is in proportion to the reward. Zero reward gives zero change.</p>
-
-        <h2>The code</h2>
-        <p>Button A pays 30% of the time. Button B pays 70%. Each button has a preference number. A softmax changes the preferences into probabilities.</p>
-<pre><code>import math, random
+        <p>The update rule is short. Press a button according to the current probabilities, and if a coin comes out, make that button a bit more likely.</p>
+        <pre><code>import math, random
 
 pay = [0.3, 0.7]       # hidden from the agent
-pref = [0.0, 0.0]      # one preference for each button
+pref = [0.0, 0.0]      # one preference per button
 
 for step in range(2000):
     e = [math.exp(x) for x in pref]
     p = [x / sum(e) for x in e]              # probabilities
 
-    a = 0 if random.random() &lt; p[0] else 1   # sample an action
+    a = 0 if random.random() &lt; p[0] else 1   # sample a button
     r = 1 if random.random() &lt; pay[a] else 0
 
     for i in range(2):
         grad = (1 - p[i]) if i == a else -p[i]
-        pref[i] += 0.1 * r * grad            # push toward what paid
+        pref[i] += 0.1 * r * grad
 
 print(p)   # about [0.01, 0.99]</code></pre>
-        <p>The agent now pushes button B 99% of the time. This method is named REINFORCE.</p>
+        <p><code>pref</code> holds one number per button and the softmax lines turn those into probabilities. The <code>grad</code> line is the only slightly opaque part. For the button that was pressed it is <code>1 - p</code>, so the push is large when that button was unlikely and shrinks as it becomes the favourite, and the other button gets pushed down by a matching amount. When <code>r</code> is 0 nothing moves. After 2,000 presses the policy sits at about 1% A and 99% B.</p>
 
-        <h2>The problem: every reward looks good</h2>
-        <p>Change the rewards. Button A always pays 10. Button B always pays 11.</p>
-        <p>Both rewards are positive. So each action makes its own probability go up, and learning is slow and noisy.</p>
-        <p>The fix is to compare with the average. Subtract the average reward, the <strong>baseline</strong>, from each reward.</p>
-        <div class="table-wrap">
-            <table>
-                <tr><th>Button</th><th>Reward</th><th>Reward − baseline (10.5)</th><th>Effect</th></tr>
-                <tr><td>A</td><td>10</td><td>−0.5</td><td>Less likely</td></tr>
-                <tr><td>B</td><td>11</td><td>+0.5</td><td>More likely</td></tr>
-            </table>
-        </div>
-        <p>The number "reward − baseline" is the <strong>advantage</strong>. It answers one question: was this action better than usual?</p>
+        <p>You hit a weakness quickly. Suppose A always pays 10 and B always pays 11. Both rewards are positive, so whichever button gets pressed becomes more likely, and the policy only drifts toward B slowly because B's pushes are slightly bigger. The standard fix is to subtract the average reward first. With a baseline of 10.5, A scores −0.5 and B scores +0.5, so A now gets pushed down and B gets pushed up. That "reward minus what you'd normally get" number is called the advantage.</p>
 
-        <h2>Why this matters for language models</h2>
-        <p>A language model is a policy. The state is the text so far. The action is the next token. The model gives a probability to each token.</p>
-        <p>So the same rule trains a language model: if an answer got a reward above the baseline, make its tokens more likely.</p>
-
-        <p class="note">Sample, score, and make better-than-usual actions more likely.</p>
-        <a class="next" href="blog-grpo.html">Next: GRPO, from scratch →</a>
+        <p>RL on a language model works the same way. The model is the policy, the next token is the action, and training makes the tokens of better-than-average answers more likely. <a href="blog-grpo.html">GRPO</a> is one way of deciding what "average" means.</p>
     </article>
 
     <footer>&copy; 2026</footer>

@@ -3,40 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A confident wrong policy rarely tries the right action, so it rarely gets corrected.">
-    <title>Policy gradients are slowest when most wrong · Shourja Mukherjee</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>A confidently wrong policy barely learns · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-    <nav>
-        <a href="index.html">Shourja Mukherjee</a>
-        <a class="right" href="blog.html">Blog</a>
-    </nav>
+    <nav><a href="index.html">← Shourja Mukherjee</a></nav>
 
     <article>
-        <h1>Policy gradients are slowest when most wrong</h1>
-        <p class="meta">November 2026</p>
-        <p class="lead">You would expect a big error to give a big correction. With a softmax policy it is the opposite.</p>
+        <h1>A confidently wrong policy barely learns</h1>
+        <p>I used to assume that the more wrong a policy is, the bigger the correction it gets. With a softmax policy trained by policy gradient it goes the other way, and the reason is mechanical. The policy only learns from the actions it samples. If it puts 99.9% on the wrong action, it tries the right one about once in a thousand steps, so it gets about one useful update per thousand.</p>
 
-        <p>A policy gradient learns from what it samples. If the policy is 99.9% sure of the wrong action, it tries the right one once in a thousand steps. That is one useful lesson per thousand.</p>
+        <p>Mei et al. make this precise. Softmax policy gradient does converge, at a rate of 1/t, and the bound carries a constant of 1/c², where c is the smallest probability the best action has at any point during training. If the best action starts at 0.1%, that constant is at least a million. They also show that you can't get rid of that dependence.</p>
 
-        <h2>What the paper proves</h2>
-        <p>Softmax policy gradient does converge, at rate 1/t. But the bound has a constant in front: 1/c², where c is the lowest probability the best action ever has during training.</p>
-        <p>Start with the best action at 0.1% and that constant is at least a million. The paper is direct about it: for a bad start c can be tiny, and you cannot remove the dependence.</p>
+        <p>Here is a toy version. There are two buttons, B pays out 70% of the time and A pays 30%. I start the policy leaning toward A by some amount and count the steps until it picks B 90% of the time.</p>
 
-        <h2>Try it</h2>
-        <p>Two buttons. B pays 70% of the time, A pays 30%. Start the policy leaning toward A and count the steps until it picks B 90% of the time.</p>
         <div class="table-wrap">
-            <table>
-                <tr><th>Starts on the wrong button</th><th>Steps to learn (median of 100 runs)</th></tr>
-                <tr><td>50%</td><td>152</td></tr>
-                <tr><td>90%</td><td>322</td></tr>
-                <tr><td>99%</td><td>1,581</td></tr>
-                <tr><td>99.9%</td><td>13,321</td></tr>
-            </table>
+        <table>
+            <tr><th>Starting probability of the wrong button</th><th>Steps to learn (median of 100 runs)</th></tr>
+            <tr><td>50%</td><td>152</td></tr>
+            <tr><td>90%</td><td>322</td></tr>
+            <tr><td>99%</td><td>1,581</td></tr>
+            <tr><td>99.9%</td><td>13,321</td></tr>
+        </table>
         </div>
-        <p>These numbers are from my own toy run with sampled rewards, not from the paper. The paper's setting uses the exact gradient. The shape is the same: each extra 9 costs far more than the last.</p>
-<pre><code>import math, random, statistics
+        <pre><code>import math, random, statistics
 
 def steps_to_learn(p_wrong, seed):
     random.seed(seed)
@@ -55,11 +45,11 @@ def steps_to_learn(p_wrong, seed):
 for p_wrong in (0.5, 0.9, 0.99, 0.999):
     runs = [steps_to_learn(p_wrong, s) for s in range(100)]
     print(p_wrong, statistics.median(runs))</code></pre>
+        <p>Those numbers come from my own run with sampled rewards, whereas the paper analyses the exact gradient, but the pattern is the same. Each extra nine of misplaced confidence costs a lot more than the one before it.</p>
 
-        <h2>The fix</h2>
-        <p>Entropy regularization: pay the policy a little to stay unsure. The paper shows the rate goes from 1/t to exponential. The policy never gets sure enough to stop looking.</p>
+        <p>The usual remedy is an entropy bonus, which rewards the policy a little for staying uncertain so that it keeps sampling every action occasionally. The paper shows that with entropy regularisation the convergence rate improves from 1/t to exponential.</p>
+
         <p class="paper">Paper: <a href="https://arxiv.org/abs/2005.06392" target="_blank" rel="noopener">Mei, Xiao, Szepesvári, Schuurmans. On the Global Convergence Rates of Softmax Policy Gradient Methods (ICML 2020)</a></p>
-        <a class="next" href="blog.html">← All posts</a>
     </article>
 
     <footer>&copy; 2026</footer>
