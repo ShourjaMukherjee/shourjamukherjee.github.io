@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Reinforcement learning is learning by trial and score. A short explanation from scratch.">
+    <title>Reinforcement learning, from scratch · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a class="name" href="index.html">Shourja Mukherjee</a>
+        <a href="index.html">Home</a>
+        <a href="blog.html">Blog</a>
+    </nav>
+
+    <article>
+        <h1>Reinforcement learning, from scratch</h1>
+        <p class="meta">November 13, 2026 · 3 min read</p>
+
+        <p class="lead">Reinforcement learning (RL) is learning by trial and score.</p>
+        <p>Nobody shows the correct answer. You try something. You get a score. You do more of what scored well.</p>
+        <p>A child learns to ride a bicycle this way. No manual. Only falls and fewer falls.</p>
+
+        <h2>The loop</h2>
+        <figure>
+            <svg viewBox="0 0 640 210" role="img" aria-label="The agent sends an action to the environment. The environment sends a state and a reward back to the agent.">
+                <rect class="box" x="40" y="75" width="150" height="60" rx="6"/>
+                <text x="115" y="110" text-anchor="middle">Agent</text>
+                <rect class="box" x="450" y="75" width="150" height="60" rx="6"/>
+                <text x="525" y="110" text-anchor="middle">Environment</text>
+                <path class="arrow" d="M115 75 V35 H525 V67"/><path class="head" d="M525 75 l-5 -9 h10 z"/>
+                <text x="320" y="26" text-anchor="middle">action</text>
+                <path class="arrow" d="M525 135 V175 H115 V143"/><path class="head" d="M115 135 l-5 9 h10 z"/>
+                <text x="320" y="198" text-anchor="middle">state + reward</text>
+            </svg>
+        </figure>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Word</th><th>Meaning</th><th>Bicycle example</th></tr>
+                <tr><td>Agent</td><td>The learner</td><td>The child</td></tr>
+                <tr><td>Environment</td><td>The world around the agent</td><td>Bicycle and road</td></tr>
+                <tr><td>State</td><td>What the agent sees now</td><td>Speed, tilt</td></tr>
+                <tr><td>Action</td><td>What the agent does</td><td>Steer, pedal</td></tr>
+                <tr><td>Reward</td><td>The score for the action</td><td>+1 upright, −1 fall</td></tr>
+                <tr><td>Policy</td><td>The rule: state → action</td><td>"Tilt left, steer left"</td></tr>
+            </table>
+        </div>
+        <p>The goal: find the policy that gets the most total reward.</p>
+
+        <h2>The smallest example</h2>
+        <p>A machine has two buttons. Each button gives a coin some of the time. Button A pays 30% of the time. Button B pays 70%. The agent does not know these numbers.</p>
+        <p>The agent keeps one number for each button: the average reward so far. Then it repeats two steps:</p>
+        <ol>
+            <li>Push the button with the higher average.</li>
+            <li>Move that average a small step toward the result.</li>
+        </ol>
+<pre><code>import random
+
+pay = [0.3, 0.7]      # hidden from the agent
+Q = [0.0, 0.0]        # the agent's estimate for each button
+N = [0, 0]            # pushes for each button
+
+for step in range(1000):
+    if random.random() &lt; 0.1:
+        a = random.randrange(2)      # explore
+    else:
+        a = Q.index(max(Q))          # exploit
+    r = 1 if random.random() &lt; pay[a] else 0
+    N[a] += 1
+    Q[a] += (r - Q[a]) / N[a]        # move toward the result
+
+print(Q, N)   # about [0.26, 0.71], [139, 861]</code></pre>
+        <p>After 1,000 pushes, the estimates are near the true values. The agent pushes button B most of the time. It learned from rewards only.</p>
+
+        <h2>Explore or exploit</h2>
+        <p>Look at the line with <code>0.1</code>. One time in ten, the agent pushes a random button.</p>
+        <p>Remove that line and the agent can fail. If button A pays first, the agent pushes A forever. It never finds out that B is better.</p>
+        <ul>
+            <li><strong>Exploit:</strong> do what looks best now.</li>
+            <li><strong>Explore:</strong> try something else, to learn.</li>
+        </ul>
+        <p>Every RL method must balance these two.</p>
+
+        <h2>Late rewards</h2>
+        <p>The buttons pay immediately. Most real tasks do not.</p>
+        <p>In chess, the only reward comes at the end: win or lose. Which of the 40 moves caused the win? This is the credit assignment problem. It is the hard part of RL.</p>
+        <p>The usual answer has two parts:</p>
+        <ul>
+            <li><strong>Return.</strong> Score an action by all the reward that follows it, not only the next reward.</li>
+            <li><strong>Discount.</strong> Count later rewards a little less. A reward 10 steps away is worth less than a reward now.</li>
+        </ul>
+
+        <h2>Three ways to learn</h2>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Type</th><th>You are given</th><th>Example</th></tr>
+                <tr><td>Supervised</td><td>The correct answer</td><td>Photo → "cat"</td></tr>
+                <tr><td>Unsupervised</td><td>Only data</td><td>Group similar photos</td></tr>
+                <tr><td>Reinforcement</td><td>Only a score</td><td>Win a game</td></tr>
+            </table>
+        </div>
+
+        <div class="note">
+            <strong>In one line:</strong> act, get a reward, adjust, repeat. The reward defines what the agent learns, so choose the reward with care.
+        </div>
+    </article>
+
+    <footer>&copy; 2026 Shourja Mukherjee</footer>
+</body>
+</html>

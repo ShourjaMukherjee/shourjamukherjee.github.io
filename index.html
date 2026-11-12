@@ -3,117 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shourja Mukherjee - Personal Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        .section {
-            margin-bottom: 30px;
-        }
-    </style>
+    <meta name="description" content="Shourja Mukherjee. Senior Machine Learning Engineer. Evals, RL environments, and agentic systems.">
+    <title>Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav>
+        <a class="name" href="index.html">Shourja Mukherjee</a>
+        <a href="index.html">Home</a>
+        <a href="blog.html">Blog</a>
+    </nav>
+
     <header>
         <h1>Shourja Mukherjee</h1>
-        <p>Senior NLP Engineer | shourja321@gmail.com | +91 9381630887</p>
-        <p><a href="https://www.linkedin.com/in/shourja-mukherjee-772241185/" target="_blank">LinkedIn Profile</a></p>
+        <p class="meta">Senior Machine Learning Engineer · Bangalore, India</p>
+        <p class="meta">
+            <a href="mailto:shourja321@gmail.com">shourja321@gmail.com</a> ·
+            <a href="https://www.linkedin.com/in/shourja-mukherjee" target="_blank" rel="noopener">LinkedIn</a> ·
+            <a href="https://github.com/ShourjaMukherjee" target="_blank" rel="noopener">GitHub</a>
+        </p>
     </header>
 
-    <section class="section" id="about">
-        <h2>About Me</h2>
-        <p>I am a Senior NLP Engineer with expertise in developing and deploying Large Language Models (LLMs) for various applications. My passion lies in solving complex problems using cutting-edge natural language processing techniques and machine learning algorithms.</p>
+    <section id="about">
+        <h2>About</h2>
+        <p class="lead">I build AI systems for intensive care. My current work is on evaluation platforms, RL environments, and agentic clinical workflows.</p>
     </section>
 
-    <section class="section" id="professional-experience">
-        <h2>Professional Experience</h2>
-        
-        <h3>Couture.ai - Bangalore, India</h3>
-        <h4>Senior NLP Engineer (Apr 2024 - Present)</h4>
-        <ul>
-            <li>Led a team of 5 to deliver an end-to-end POC for document agnostic feature extraction from unstructured documents using LLMs and OCR.</li>
-            <li>Developed, fine-tuned, and deployed Large Language Models (LLMs) using both open-source and closed-source models.</li>
-            <li>Designed and implemented LLM-based solutions for diverse use cases in various domains.</li>
-        </ul>
-        
-        <h4>NLP Engineer (Jun 2022 - Apr 2024)</h4>
-        <ul>
-            <li>Led research initiatives and oversaw end-to-end development for call transcript analysis.</li>
-            <li>Built a threshold optimization system for fraud detection.</li>
-            <li>Developed POCs for various client demos covering NLP approaches.</li>
-        </ul>
-
-        <h3>Cloudphysician - Bangalore, India (Remote)</h3>
-        <h4>Summer NLP Intern (Jun 2021 - Aug 2021)</h4>
-        <ul>
-            <li>Worked on creating templated ICU notes from physician dictation using Natural Language processing techniques.</li>
-            <li>Learned efficient ML-ops techniques for machine learning and used sklearn, huggingface, spaCy, pandas, etc.</li>
-        </ul>
-
-        <h3>Fieldon - Hyderabad, India</h3>
-        <h4>Software Engineering Intern (Jan 2020 - Apr 2020)</h4>
-        <ul>
-            <li>Worked in a team of 4 to develop FieldOn Impact, a software system to streamline incident reporting for society issues.</li>
-            <li>Created the administrative portal interface frontend using Node.js</li>
+    <section id="writing">
+        <h2>Writing</h2>
+        <ul class="post-list">
+            <li>
+                <a href="blog-evals.html">Evals, from scratch</a>
+                <p>An eval is an exam for a model. Here are the parts.</p>
+            </li>
+            <li>
+                <a href="blog-rl.html">Reinforcement learning, from scratch</a>
+                <p>Try, get a score, adjust. The full idea in one small example.</p>
+            </li>
         </ul>
     </section>
 
-    <section class="section" id="projects">
-        <h2>Project Experience</h2>
+    <section id="experience">
+        <h2>Experience</h2>
 
-        <h3>Question Answering Over Websites (2023)</h3>
+        <h3>Cloudphysician · Senior Machine Learning Engineer</h3>
+        <p class="meta">June 2026 – Present · Bangalore, India</p>
         <ul>
-            <li>Developed a question answering engine utilizing a quantized Llama2 model integrated with Langchain for any website's sitemap.</li>
-            <li>Established a system to store the website's sitemap in a variety of VectorDBs such as Milvus/QDrant/ChromaDB, enabling quicker inferencing while preserving a tree structure for seamless questioning across the website's hierarchy.</li>
+            <li>Lead the NLP vertical, with a team of 3, towards an agentic Clinical Decision System for ICU workflows.</li>
+            <li>Drove the architecture and hands-on execution of a ground-up product rewrite to go-live. Wrote core full-stack features, agentic workflows, and a zero-downtime MongoDB to PostgreSQL migration.</li>
+            <li>Building the evaluation platform for a suite of ICU AI models: versioned datasets, spec-driven scoring, and full run lineage.</li>
+            <li>Building a suite of RL environments and tasks for clinical workflows, and designing post-training recipes that deliver measurable gains on open-weight models.</li>
         </ul>
 
-        <h3>Fill in the Blanks Generator | Megathon (2019)</h3>
+        <h3>Cloudphysician · Machine Learning Engineer</h3>
+        <p class="meta">March 2025 – June 2026 · Bangalore, India</p>
         <ul>
-            <li>Created a project aimed at generating fill-in-the-blanks questions from a given textbook using NLP and Machine learning techniques.</li>
-            <li>Achieved 3rd Runners Up as part of the Embibe problem statement.</li>
+            <li>Built HERA, an automated lab report ingestion tool that parses and annotates unstructured medical reports. It reduces nurse workload by ~10 minutes per patient per day.</li>
+            <li>Developed a rounding assistant that transcribes multi-doctor discussions, generates structured clinical notes, and automates order placement across patients.</li>
+            <li>Maintained and upgraded AIRA, a notetaking module for doctors that integrates with live patient data.</li>
         </ul>
 
-        <h3>Intent Classifier for Complaint Emails (2022)</h3>
+        <h3>Couture.ai · Senior NLP Engineer</h3>
+        <p class="meta">June 2022 – March 2025 · Bangalore, India</p>
         <ul>
-            <li>Trained an XGBoost model with 94 percent accuracy over a customer complaints dataset.</li>
-            <li>Performed standard EDA, keyword extraction, topic modelling, and other analytics on the same dataset for insights.</li>
+            <li>Led productionisation and demo POCs for Onboarding Assist, a document ingestion, validation, and processing pipeline for large corporations.</li>
+            <li>Trained a multiclass classifier (98% accuracy) on noisy bank transaction text with high inter-class ambiguity.</li>
+            <li>Built a threshold optimization system for a legacy rule-based fraud detection tool by replicating the tool with an ML model.</li>
+            <li>Designed LLM-based solutions across domains. Ran fine-tuning initiatives with LoRA and model quantization.</li>
+            <li>Led research, system design, and end-to-end development for call transcript analysis.</li>
         </ul>
 
-        <h3>Fingerprint Classification with SVMs (2021)</h3>
+        <h3>Cloudphysician · Summer NLP Intern</h3>
+        <p class="meta">June 2021 – August 2021 · Remote</p>
         <ul>
-            <li>Implemented Fingerprint classification with combinations of support vector machines.</li>
-            <li>Compared performance of different classification techniques with that of SVMs.</li>
+            <li>Built classification models (BERT, XGBoost) that sort physician dictation sentences into medical note sections, for automated templated ICU notes.</li>
         </ul>
     </section>
 
-    <section class="section" id="achievements">
-        <h2>Achievements</h2>
+    <section id="projects">
+        <h2>Projects</h2>
+
+        <h3>InsuranceLLM <span class="meta">· 2024</span></h3>
         <ul>
-            <li>2019 | Megathon 3rd runner up (Embibe)</li>
-            <li>2018 | 3rd rank in School for CBSE Boards</li>
+            <li>Fine-tuned phi-2 (2.7B) on an insurance QA dataset.</li>
+            <li>Released LoRA adapters, in quantized and normal versions, on Hugging Face.</li>
+        </ul>
+
+        <h3>Question Answering Over Websites <span class="meta">· 2023</span></h3>
+        <ul>
+            <li>Built a question answering engine for any website sitemap with a quantized Llama2 model.</li>
+            <li>Stored the sitemap in vector DBs (Milvus, Qdrant, ChromaDB) and kept the tree structure of the website.</li>
+        </ul>
+
+        <h3>Intent Classifier for Complaint Emails <span class="meta">· 2022</span></h3>
+        <ul>
+            <li>Trained an XGBoost model with 94% accuracy on a customer complaints dataset.</li>
+        </ul>
+
+        <h3>Fill in the Blanks Generator <span class="meta">· Megathon 2019</span></h3>
+        <ul>
+            <li>Built an NLP-based fill-in-the-blanks generator from textbooks. Won 3rd Runner-Up.</li>
         </ul>
     </section>
 
-    <section class="section" id="skills">
-        <h2>Technical Skills</h2>
-        <p><strong>Proficient:</strong> Python, PyTorch, transformers, FastAPI, Bash scripting</p>
-        <p><strong>Familiar:</strong> C/C++, MongoDB, MySQL, MERN stack, Java, HTML, Javascript, LATEX, Arduino, Flask, x86</p>
+    <section id="education">
+        <h2>Education</h2>
+        <h3>IIIT Hyderabad</h3>
+        <p class="meta">B.Tech in Computer Science · May 2022</p>
     </section>
 
-    <footer>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="blog.html">Blog</a>
-        </nav>
-        <p>&copy; 2024 Shourja Mukherjee. All rights reserved.</p>
-    </footer>
+    <section id="skills">
+        <h2>Skills</h2>
+        <ul class="tags">
+            <li>Python</li><li>PyTorch</li><li>transformers</li><li>GRPO / RLVR</li><li>vLLM</li>
+            <li>Agentic Orchestration</li><li>MCP</li><li>Claude Code</li><li>FastAPI</li>
+            <li>PostgreSQL</li><li>MongoDB</li><li>MySQL</li><li>JS / TS</li>
+            <li>Kubernetes</li><li>Docker</li><li>Linux / Bash</li><li>CI/CD</li>
+        </ul>
+    </section>
+
+    <footer>&copy; 2026 Shourja Mukherjee</footer>
 </body>
 </html>
