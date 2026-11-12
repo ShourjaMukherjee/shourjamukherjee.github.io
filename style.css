@@ -153,3 +153,9 @@ footer { margin-top: 72px; color: var(--muted); font-size: 0.85rem; }
     article h1 { font-size: 1.8rem; }
     nav { margin-bottom: 44px; }
 }
+
+/* Paper notes */
+.paper { margin-top: 40px; color: var(--muted); font-size: 0.9rem; }
+figcaption { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 8px; }
+svg .axis { stroke: var(--muted); stroke-width: 1.2; fill: none; }
+svg .arrow.dim { stroke: var(--muted); stroke-dasharray: 6 5; }
