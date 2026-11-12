@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GRPO grades each answer against the other answers to the same question.">
+    <title>GRPO, from scratch · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Shourja Mukherjee</a>
+        <a class="right" href="blog.html">Blog</a>
+    </nav>
+
+    <article>
+        <h1>GRPO, from scratch</h1>
+        <p class="meta">November 13, 2026 · 3 min read</p>
+        <p class="lead">GRPO grades on a curve.</p>
+        <p>Ask the model one question many times. Score each answer. Answers above the group average become more likely. Answers below become less likely.</p>
+        <p>GRPO means Group Relative Policy Optimization. It is a common method to train language models with RL.</p>
+
+        <h2>Where the baseline comes from</h2>
+        <p>The <a href="blog-policy-gradients.html">last post</a> ended with one need: a baseline, to tell if an answer was better than usual.</p>
+        <p>Older methods train a second model to predict that baseline. GRPO does not. It uses the other answers to the same question as the baseline.</p>
+
+        <h2>One step, by hand</h2>
+        <p>The question: <em>what is 17 × 3?</em> The model answers 4 times. The reward is 1 for a correct answer and 0 for a wrong answer.</p>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Answer</th><th>Reward</th><th>Advantage</th><th>Effect</th></tr>
+                <tr><td>51</td><td>1</td><td>+1.73</td><td>More likely</td></tr>
+                <tr><td>41</td><td>0</td><td>−0.58</td><td>Less likely</td></tr>
+                <tr><td>54</td><td>0</td><td>−0.58</td><td>Less likely</td></tr>
+                <tr><td>61</td><td>0</td><td>−0.58</td><td>Less likely</td></tr>
+            </table>
+        </div>
+        <p>The advantage is the reward, minus the group average, divided by the group spread.</p>
+<pre><code>def advantages(rewards):
+    mean = sum(rewards) / len(rewards)
+    std = (sum((r - mean) ** 2 for r in rewards) / len(rewards)) ** 0.5
+    if std == 0:
+        return [0.0] * len(rewards)
+    return [(r - mean) / std for r in rewards]
+
+advantages([1, 0, 0, 0])   # [ 1.73, -0.58, -0.58, -0.58]
+advantages([1, 1, 0, 0])   # [ 1.0,   1.0,  -1.0,  -1.0 ]
+advantages([1, 1, 1, 1])   # [ 0.0,   0.0,   0.0,   0.0 ]
+advantages([0, 0, 0, 0])   # [ 0.0,   0.0,   0.0,   0.0 ]</code></pre>
+        <p>Then the model is updated: tokens of answers with a positive advantage become more likely.</p>
+
+        <h2>Look at the last two lines</h2>
+        <p>If all answers are correct, every advantage is zero. If all answers are wrong, every advantage is also zero. The model learns nothing from that question.</p>
+        <p>This is the most useful fact about GRPO. The model learns only from questions that it gets right some of the time.</p>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Question is</th><th>Group rewards</th><th>Learning</th></tr>
+                <tr><td>Too easy</td><td>1, 1, 1, 1</td><td>None</td></tr>
+                <tr><td>Too hard</td><td>0, 0, 0, 0</td><td>None</td></tr>
+                <tr><td>At the edge</td><td>1, 0, 0, 1</td><td>Yes</td></tr>
+            </table>
+        </div>
+        <p>So the choice of tasks is as important as the method.</p>
+
+        <h2>Two safety limits</h2>
+        <p>A large update can break a model. GRPO has two limits, both from an older method, PPO.</p>
+        <ul>
+            <li><strong>Clip.</strong> One update can change a probability only by a small ratio.</li>
+            <li><strong>KL penalty.</strong> The model pays a cost when it moves far from the model it started as.</li>
+        </ul>
+
+        <h2>The full loop</h2>
+        <ol>
+            <li>Take a question.</li>
+            <li>Sample a group of answers.</li>
+            <li>Score each answer.</li>
+            <li>Compute the advantages in the group.</li>
+            <li>Update the model, with the two limits.</li>
+            <li>Repeat.</li>
+        </ol>
+
+        <p class="note">Many answers to one question. Score them. Move toward the answers that beat the group.</p>
+        <a class="next" href="blog-verifiable-rewards.html">Next: Rewards you can check →</a>
+    </article>
+
+    <footer>&copy; 2026</footer>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A verifiable reward is a score that a program can compute. Why it works, and how it fails.">
+    <title>Rewards you can check · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Shourja Mukherjee</a>
+        <a class="right" href="blog.html">Blog</a>
+    </nav>
+
+    <article>
+        <h1>Rewards you can check</h1>
+        <p class="meta">November 13, 2026 · 3 min read</p>
+        <p class="lead">The agent learns what the reward pays for. Not what you meant.</p>
+        <p>So the reward must be correct. The safest reward is one that a program can check.</p>
+
+        <h2>Verifiable rewards</h2>
+        <p>A verifiable reward comes from a check with a clear yes or no. No opinion is involved.</p>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Task</th><th>The check</th></tr>
+                <tr><td>Solve a math problem</td><td>Does the answer equal 51?</td></tr>
+                <tr><td>Write a function</td><td>Do the tests pass?</td></tr>
+                <tr><td>Solve a sudoku</td><td>Is each row, column, and box valid?</td></tr>
+                <tr><td>Output JSON</td><td>Does the output parse and match the schema?</td></tr>
+            </table>
+        </div>
+        <p>Training with rewards of this type has a name: RLVR, RL with verifiable rewards.</p>
+<pre><code>def reward(answer):
+    return 1 if answer.strip() == "51" else 0</code></pre>
+        <p>The check is cheap, fast, and the same each time. You can run it a million times.</p>
+
+        <h2>When the reward is wrong</h2>
+        <p>A reward is a measurement of the goal. It is not the goal. An agent can find a way to get the measurement without the goal. This is <strong>reward hacking</strong>.</p>
+        <div class="table-wrap">
+            <table>
+                <tr><th>You wanted</th><th>You rewarded</th><th>The agent did</th></tr>
+                <tr><td>A clean room</td><td>No dirt in view of the camera</td><td>Covered the camera</td></tr>
+                <tr><td>Correct code</td><td>Tests pass</td><td>Deleted the tests</td></tr>
+                <tr><td>A good summary</td><td>Key words are present</td><td>Wrote a list of key words</td></tr>
+                <tr><td>A fast lap</td><td>Points for checkpoints</td><td>Drove in a circle on one checkpoint</td></tr>
+            </table>
+        </div>
+        <p>The agent did not cheat. It did exactly what the reward paid for.</p>
+
+        <h2>Sparse or dense</h2>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Type</th><th>When it pays</th><th>Good</th><th>Bad</th></tr>
+                <tr><td>Sparse</td><td>Only at the end</td><td>Hard to hack</td><td>Slow to learn from</td></tr>
+                <tr><td>Dense</td><td>At each small step</td><td>Fast to learn from</td><td>Easy to hack</td></tr>
+            </table>
+        </div>
+        <p>Each small reward is one more thing the agent can game. Start sparse. Add steps only when the agent cannot learn.</p>
+
+        <h2>Four habits</h2>
+        <ol>
+            <li><strong>Check the result, not the method.</strong> Reward the correct answer, not the steps that look correct.</li>
+            <li><strong>Keep the check out of reach.</strong> The agent must not be able to read or edit the tests.</li>
+            <li><strong>Try to break your own reward.</strong> Ask: what is the laziest way to get a 1?</li>
+            <li><strong>Read the high scores.</strong> A score that went up fast is the first place to look for a hack.</li>
+        </ol>
+
+        <p class="note">A reward is a measurement. Make it one that a program can check, and one that only the real goal can satisfy.</p>
+        <a class="next" href="blog.html">← All posts</a>
+    </article>
+
+    <footer>&copy; 2026</footer>
+</body>
+</html>

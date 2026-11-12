@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Short posts on core machine learning ideas, by Shourja Mukherjee.">
+    <meta name="description" content="Short posts on core machine learning ideas.">
     <title>Blog · Shourja Mukherjee</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <nav>
-        <a class="name" href="index.html">Shourja Mukherjee</a>
-        <a href="index.html">Home</a>
-        <a href="blog.html">Blog</a>
+        <a href="index.html">Shourja Mukherjee</a>
+        <a class="right" href="blog.html">Blog</a>
     </nav>
 
     <header>
@@ -19,24 +18,42 @@
         <p class="meta">Core ideas. Few words.</p>
     </header>
 
+    <h2>Reinforcement learning · a series</h2>
     <ul class="post-list">
-        <li>
-            <a href="blog-evals.html">Evals, from scratch</a>
-            <p class="meta">November 13, 2026</p>
-            <p>An eval is an exam for a model. Here are the parts.</p>
-        </li>
-        <li>
-            <a href="blog-rl.html">Reinforcement learning, from scratch</a>
-            <p class="meta">November 13, 2026</p>
+        <li><a href="blog-rl.html">
+            <div class="row"><span class="t">Reinforcement learning, from scratch</span><span class="d">Part 1</span></div>
             <p>Try, get a score, adjust. The full idea in one small example.</p>
-        </li>
-        <li>
-            <a href="blog-post-1.html">Understanding Transformers: The Game-Changers in NLP</a>
-            <p class="meta">May 1, 2024</p>
-            <p>How Transformers changed Natural Language Processing.</p>
-        </li>
+        </a></li>
+        <li><a href="blog-rl-environments.html">
+            <div class="row"><span class="t">RL environments, from scratch</span><span class="d">Part 2</span></div>
+            <p>A small world with two functions: reset and step.</p>
+        </a></li>
+        <li><a href="blog-policy-gradients.html">
+            <div class="row"><span class="t">Policy gradients, from scratch</span><span class="d">Part 3</span></div>
+            <p>If an action got a reward, make that action more likely.</p>
+        </a></li>
+        <li><a href="blog-grpo.html">
+            <div class="row"><span class="t">GRPO, from scratch</span><span class="d">Part 4</span></div>
+            <p>Grade each answer against the other answers to the same question.</p>
+        </a></li>
+        <li><a href="blog-verifiable-rewards.html">
+            <div class="row"><span class="t">Rewards you can check</span><span class="d">Part 5</span></div>
+            <p>The agent learns what the reward pays for. Not what you meant.</p>
+        </a></li>
     </ul>
 
-    <footer>&copy; 2026 Shourja Mukherjee</footer>
+    <h2>More</h2>
+    <ul class="post-list">
+        <li><a href="blog-evals.html">
+            <div class="row"><span class="t">Evals, from scratch</span><span class="d">Nov 2026</span></div>
+            <p>An eval is an exam for a model. Here are the parts.</p>
+        </a></li>
+        <li><a href="blog-post-1.html">
+            <div class="row"><span class="t">Understanding Transformers</span><span class="d">May 2024</span></div>
+            <p>How Transformers changed Natural Language Processing.</p>
+        </a></li>
+    </ul>
+
+    <footer>&copy; 2026</footer>
 </body>
 </html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Make good actions more likely. The policy gradient idea in one small example.">
+    <title>Policy gradients, from scratch · Shourja Mukherjee</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Shourja Mukherjee</a>
+        <a class="right" href="blog.html">Blog</a>
+    </nav>
+
+    <article>
+        <h1>Policy gradients, from scratch</h1>
+        <p class="meta">November 13, 2026 · 3 min read</p>
+        <p class="lead">If an action got a reward, make that action more likely.</p>
+        <p>That sentence is the full method. The rest is arithmetic.</p>
+
+        <h2>A policy is a set of probabilities</h2>
+        <p>In the <a href="blog-rl.html">first post</a>, the agent kept an average reward for each button. Here the agent keeps something more direct: the probability of each action.</p>
+        <div class="table-wrap">
+            <table>
+                <tr><th></th><th>Button A</th><th>Button B</th></tr>
+                <tr><td>At the start</td><td>50%</td><td>50%</td></tr>
+                <tr><td>After learning</td><td>1%</td><td>99%</td></tr>
+            </table>
+        </div>
+        <p>To act, the agent samples from these probabilities. No explore rule is necessary. The sampling does the exploring.</p>
+
+        <h2>The update</h2>
+        <ol>
+            <li>Sample an action.</li>
+            <li>Get the reward.</li>
+            <li>If the reward is high, raise the probability of that action. The other actions go down.</li>
+        </ol>
+        <p>The size of the change is in proportion to the reward. Zero reward gives zero change.</p>
+
+        <h2>The code</h2>
+        <p>Button A pays 30% of the time. Button B pays 70%. Each button has a preference number. A softmax changes the preferences into probabilities.</p>
+<pre><code>import math, random
+
+pay = [0.3, 0.7]       # hidden from the agent
+pref = [0.0, 0.0]      # one preference for each button
+
+for step in range(2000):
+    e = [math.exp(x) for x in pref]
+    p = [x / sum(e) for x in e]              # probabilities
+
+    a = 0 if random.random() &lt; p[0] else 1   # sample an action
+    r = 1 if random.random() &lt; pay[a] else 0
+
+    for i in range(2):
+        grad = (1 - p[i]) if i == a else -p[i]
+        pref[i] += 0.1 * r * grad            # push toward what paid
+
+print(p)   # about [0.01, 0.99]</code></pre>
+        <p>The agent now pushes button B 99% of the time. This method is named REINFORCE.</p>
+
+        <h2>The problem: every reward looks good</h2>
+        <p>Change the rewards. Button A always pays 10. Button B always pays 11.</p>
+        <p>Both rewards are positive. So each action makes its own probability go up, and learning is slow and noisy.</p>
+        <p>The fix is to compare with the average. Subtract the average reward, the <strong>baseline</strong>, from each reward.</p>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Button</th><th>Reward</th><th>Reward − baseline (10.5)</th><th>Effect</th></tr>
+                <tr><td>A</td><td>10</td><td>−0.5</td><td>Less likely</td></tr>
+                <tr><td>B</td><td>11</td><td>+0.5</td><td>More likely</td></tr>
+            </table>
+        </div>
+        <p>The number "reward − baseline" is the <strong>advantage</strong>. It answers one question: was this action better than usual?</p>
+
+        <h2>Why this matters for language models</h2>
+        <p>A language model is a policy. The state is the text so far. The action is the next token. The model gives a probability to each token.</p>
+        <p>So the same rule trains a language model: if an answer got a reward above the baseline, make its tokens more likely.</p>
+
+        <p class="note">Sample, score, and make better-than-usual actions more likely.</p>
+        <a class="next" href="blog-grpo.html">Next: GRPO, from scratch →</a>
+    </article>
+
+    <footer>&copy; 2026</footer>
+</body>
+</html>
